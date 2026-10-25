@@ -23,8 +23,10 @@ A high-performance **Custom DNS Server & Client System** implementing:
 
 ---
 
-## Author Details (Slot: F1 — Team 13)
+## Team Details (Slot: F1 — Team 13)
 - **Narne Adithya Hanuman**
+- **G Sreemanth**
+- **V. Umika**
 
 ---
 
