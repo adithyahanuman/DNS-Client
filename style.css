@@ -1,0 +1,935 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Custom DNS GUI Web Console - Exact Desktop Native Replica
+   Matches Custom DNS Client & Server Java Swing GUI
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&family=Consolas&display=swap');
+
+:root {
+  --bg-window-frame: #0d121c;
+  --bg-dark: #0f141e;
+  --bg-panel: #192130;
+  --bg-card: #222c3e;
+  --bg-row-alt: #161e2c;
+  --bg-input: #121824;
+  --bg-tab-sel: #222c3e;
+  --bg-tab-unsel: #141b28;
+
+  --accent-blue: #5aa5ff;
+  --accent-green: #37e65f;
+  --accent-red: #ff5a50;
+  --accent-amber: #ffc328;
+  --accent-purple: #d2a0ff;
+  --accent-cyan: #3cdce6;
+
+  --badge-udp: #2563eb;
+  --badge-port: #a855f7;
+  --badge-mongo: #16a34a;
+
+  --text-primary: #f0f6ff;
+  --text-muted: #b4c0d2;
+  --text-dim: #8291a8;
+
+  --border-bright: #556e96;
+  --border-dim: #303e55;
+  --border-subtle: rgba(85, 110, 150, 0.4);
+
+  --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Consolas', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: #060910;
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px;
+  overflow-x: hidden;
+  user-select: text;
+}
+
+/* ── Desktop Window Frame Container ───────────────────────────────────── */
+.desktop-window {
+  width: 100%;
+  max-width: 1360px;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 24px rgba(60, 220, 230, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.desktop-window.maximized {
+  max-width: 100% !important;
+  width: 100% !important;
+  border-radius: 0;
+  border: none;
+  margin: -12px;
+  min-height: 100vh;
+}
+
+/* ── OS Titlebar ───────────────────────────────────────────────────────── */
+.window-titlebar {
+  background: var(--bg-window-frame);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border-dim);
+  user-select: none;
+}
+
+.window-title-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.window-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.window-title-text {
+  letter-spacing: 0.02em;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.win-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  border-radius: 3px;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.win-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.win-btn.close:hover {
+  background: var(--accent-red);
+  color: #ffffff;
+}
+
+/* ── Custom DNS Brand Header ───────────────────────────────────────────── */
+.app-header {
+  background: var(--bg-dark);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--accent-blue);
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-bracket {
+  color: var(--accent-cyan);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 2px;
+  font-family: var(--font-mono);
+}
+
+.brand-name {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.brand-sub {
+  color: #becde6;
+  font-size: 14px;
+  margin-left: 10px;
+  font-weight: 400;
+}
+
+.header-badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.gui-pill {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: var(--font-main);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.02em;
+}
+
+.gui-pill.udp {
+  background: var(--badge-udp);
+}
+
+.gui-pill.port {
+  background: var(--badge-port);
+}
+
+.gui-pill.mongo {
+  background: var(--badge-mongo);
+}
+
+.gui-pill.mongo.offline {
+  background: var(--accent-red);
+}
+
+/* ── Navigation Tabs ───────────────────────────────────────────────────── */
+.tabs-bar {
+  display: flex;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border-bright);
+  padding-left: 12px;
+}
+
+.tab-btn {
+  padding: 10px 28px;
+  background: var(--bg-tab-unsel);
+  color: #d2dcf0;
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid var(--border-bright);
+  border-bottom: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  outline: none;
+  margin-right: -1px;
+}
+
+.tab-btn:hover {
+  color: #ffffff;
+  background: #1c2536;
+}
+
+.tab-btn.active {
+  background: var(--bg-tab-sel);
+  color: #ffffff;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-cyan);
+}
+
+/* ── Main Tab Content Area ─────────────────────────────────────────────── */
+.tab-content {
+  padding: 14px 16px;
+  background: var(--bg-dark);
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ── Server Tab: Top Controls & Stat Panels ────────────────────────────── */
+.server-top-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+  align-items: stretch;
+}
+
+@media (max-width: 1060px) {
+  .server-top-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.control-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-start-server {
+  background: var(--accent-green);
+  color: #ffffff;
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 9px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgba(55, 230, 95, 0.3);
+}
+
+.btn-start-server:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-start-server.running {
+  background: var(--accent-red);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(255, 90, 80, 0.4);
+}
+
+.badge-status {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  font-family: var(--font-main);
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  display: inline-block;
+}
+
+.badge-status.offline {
+  background: var(--accent-red);
+  color: #ffffff;
+}
+
+.badge-status.online {
+  background: var(--accent-green);
+  color: #0b1a10;
+}
+
+.btn-gui-ghost {
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-main);
+}
+
+.btn-gui-ghost:hover {
+  background: #2a374d;
+  color: #ffffff;
+  border-color: var(--accent-blue);
+}
+
+/* ── 5 Stat Panels with EXACT Coloured Borders ─────────────────────────── */
+.stats-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 880px) {
+  .stats-grid-5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-card-box {
+  background: var(--bg-card);
+  border-radius: 6px;
+  padding: 10px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-bright);
+}
+
+/* Colored borders exactly matching Java Swing LineBorder(accent, 1, true) */
+.stat-card-box.blue {
+  border: 1.5px solid var(--accent-blue);
+}
+
+.stat-card-box.green {
+  border: 1.5px solid var(--accent-green);
+}
+
+.stat-card-box.amber {
+  border: 1.5px solid var(--accent-amber);
+}
+
+.stat-card-box.cyan {
+  border: 1.5px solid var(--accent-cyan);
+}
+
+.stat-card-box.purple {
+  border: 1.5px solid var(--accent-purple);
+}
+
+.stat-card-stripe {
+  height: 4px;
+  width: 100%;
+  margin-bottom: 8px;
+  border-radius: 2px;
+}
+
+.stat-card-stripe.blue { background: var(--accent-blue); }
+.stat-card-stripe.green { background: var(--accent-green); }
+.stat-card-stripe.amber { background: var(--accent-amber); }
+.stat-card-stripe.cyan { background: var(--accent-cyan); }
+.stat-card-stripe.purple { background: var(--accent-purple); }
+
+.stat-card-val {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--font-main);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.stat-card-val.blue { color: var(--accent-blue); }
+.stat-card-val.green { color: var(--accent-green); }
+.stat-card-val.amber { color: var(--accent-amber); }
+.stat-card-val.cyan { color: var(--accent-cyan); }
+.stat-card-val.purple { color: var(--accent-purple); }
+
+.stat-card-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Split Cards: Server Log & Cache Viewer ────────────────────────────── */
+.server-split-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 12px;
+}
+
+.server-split-grid > div {
+  min-width: 0;
+}
+
+@media (max-width: 960px) {
+  .server-split-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gui-bordered-card {
+  background: var(--bg-card);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 440px;
+  min-width: 0;
+}
+
+/* Card Borders */
+.gui-bordered-card.blue-border {
+  border: 1.5px solid var(--accent-blue);
+}
+
+.gui-bordered-card.purple-border {
+  border: 1.5px solid var(--accent-purple);
+}
+
+.gui-bordered-card.cyan-border {
+  border: 1.5px solid var(--accent-cyan);
+}
+
+.gui-bordered-card.green-border {
+  border: 1.5px solid var(--accent-green);
+}
+
+.gui-bordered-card.amber-border {
+  border: 1.5px solid var(--accent-amber);
+}
+
+.gui-card-header {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-dim);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gui-card-header.blue-text {
+  color: var(--accent-blue);
+  background: rgba(90, 165, 255, 0.12);
+  border-left: 3px solid var(--accent-blue);
+}
+
+.gui-card-header.purple-text {
+  color: var(--accent-purple);
+  background: rgba(210, 160, 255, 0.12);
+  border-left: 3px solid var(--accent-purple);
+}
+
+.gui-card-header.cyan-text {
+  color: var(--accent-cyan);
+  background: rgba(60, 220, 230, 0.12);
+  border-left: 3px solid var(--accent-cyan);
+}
+
+.gui-card-header.green-text {
+  color: var(--accent-green);
+  background: rgba(55, 230, 95, 0.12);
+  border-left: 3px solid var(--accent-green);
+}
+
+.gui-card-header.amber-text {
+  color: var(--accent-amber);
+  background: rgba(255, 195, 40, 0.12);
+  border-left: 3px solid var(--accent-amber);
+}
+
+.header-action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-header-action {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.btn-header-tiny {
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+/* ── Inner Terminal Log Box ────────────────────────────────────────────── */
+.terminal-log-box {
+  background: #080b12;
+  flex: 1;
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: #cdd9e5;
+  line-height: 1.55;
+  overflow-y: auto;
+  max-height: 420px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.log-line { margin-bottom: 2px; }
+.log-line.time { color: var(--text-dim); }
+.log-line.cyan { color: var(--accent-cyan); }
+.log-line.green { color: var(--accent-green); }
+.log-line.amber { color: var(--accent-amber); }
+.log-line.purple { color: var(--accent-purple); }
+.log-line.red { color: var(--accent-red); }
+.log-line.sep { color: #6e91c3; }
+
+/* ── Table Container & EXACT White Header Table ────────────────────────── */
+.table-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 420px;
+  background: var(--bg-dark);
+  width: 100%;
+}
+
+table.gui-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: left;
+  table-layout: fixed;
+}
+
+/* White Table Header matching Reference Images EXACTLY */
+table.gui-table thead th {
+  background: #ffffff !important;
+  color: #00bcd4 !important;
+  font-weight: 800;
+  padding: 7px 6px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  font-family: var(--font-main);
+  border-bottom: 2px solid var(--border-bright);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+table.gui-table tbody td {
+  padding: 5px 6px;
+  border-bottom: 1px solid rgba(85, 110, 150, 0.15);
+  font-family: var(--font-main);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+
+table.gui-table tbody tr:nth-child(even) {
+  background: var(--bg-card);
+}
+
+table.gui-table tbody tr:nth-child(odd) {
+  background: var(--bg-row-alt);
+}
+
+table.gui-table tbody tr:hover {
+  background: rgba(80, 160, 255, 0.15);
+}
+
+/* Cell Specific Styles */
+.col-mono {
+  font-family: var(--font-mono) !important;
+}
+
+.col-source-dns {
+  color: var(--accent-cyan) !important;
+  font-weight: 700;
+}
+
+.col-source-chrome {
+  color: var(--accent-purple) !important;
+  font-weight: 700;
+}
+
+.col-source-cache {
+  color: var(--accent-green) !important;
+  font-weight: 700;
+}
+
+.col-source-mongo {
+  color: var(--accent-purple) !important;
+  font-weight: 700;
+}
+
+.col-latency-fast {
+  color: var(--accent-green) !important;
+  font-family: var(--font-mono) !important;
+  font-weight: 700;
+}
+
+.col-latency-slow {
+  color: var(--accent-amber) !important;
+  font-family: var(--font-mono) !important;
+  font-weight: 700;
+}
+
+.col-status-recorded {
+  color: var(--accent-amber) !important;
+  font-weight: 700;
+  text-align: center;
+}
+
+.col-status-active {
+  color: var(--accent-green) !important;
+  font-weight: 800;
+  text-align: center;
+}
+
+.col-status-expired {
+  color: var(--accent-red) !important;
+  font-weight: 800;
+  text-align: center;
+}
+
+.col-status-hit {
+  color: var(--accent-green) !important;
+  font-weight: 700;
+  text-align: center;
+}
+
+.col-status-history {
+  color: var(--accent-purple) !important;
+  font-weight: 700;
+  text-align: center;
+}
+
+.col-status-resolved {
+  color: var(--accent-cyan) !important;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ttl-cell {
+  color: var(--accent-amber);
+  font-family: var(--font-mono);
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ── Client Tab: DNS Lookup Card ───────────────────────────────────────── */
+.client-query-card {
+  background: var(--bg-card);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.client-query-card.cyan-border {
+  border: 1.5px solid var(--accent-cyan);
+}
+
+.client-query-body {
+  padding: 14px 18px;
+}
+
+.lookup-input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.lookup-input {
+  flex: 1;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.lookup-input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(60, 220, 230, 0.3);
+}
+
+.btn-resolve {
+  background: var(--accent-cyan);
+  color: #0b141e;
+  border: none;
+  border-radius: 6px;
+  padding: 0 28px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.15s ease;
+}
+
+.btn-resolve:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.quick-domain-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.chip-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.domain-chip {
+  background: var(--bg-dark);
+  color: var(--accent-cyan);
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.domain-chip:hover {
+  border-color: var(--accent-cyan);
+  background: var(--accent-cyan);
+  color: #0a121e;
+}
+
+.lookup-result-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-dim);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+.result-lbl-ip {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.result-ip-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.result-ip-val.resolved {
+  color: var(--accent-green);
+}
+
+.result-ip-val.error {
+  color: var(--accent-red);
+}
+
+.badge-res-status {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-block;
+}
+
+.badge-res-status.idle {
+  background: #1e293b;
+  color: var(--text-dim);
+}
+
+.badge-res-status.cache {
+  background: var(--accent-green);
+  color: #0b1a10;
+}
+
+.badge-res-status.history {
+  background: var(--accent-purple);
+  color: #1a0f28;
+}
+
+.badge-res-status.resolved {
+  background: var(--accent-cyan);
+  color: #0b141e;
+}
+
+.badge-res-status.error {
+  background: var(--accent-red);
+  color: #ffffff;
+}
+
+.result-time-val {
+  color: var(--accent-green);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.result-source-val {
+  color: var(--accent-amber);
+  font-size: 12px;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+.window-footer {
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-bright);
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.footer-protocol {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footer-path {
+  color: var(--accent-cyan);
+  font-weight: 700;
+  margin-left: 12px;
+}
+
+/* ── Toast Popup Notification ──────────────────────────────────────────── */
+.toast-popup {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #1e293b;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: 1px solid var(--accent-cyan);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.25s ease;
+  z-index: 9999;
+}
+
+.toast-popup.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #080b12; }
+::-webkit-scrollbar-thumb { background: #2f3e58; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #4a5f82; }

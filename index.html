@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom DNS | Server &amp; Client</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233cdce6'><text y='20' font-size='20'>☕</text></svg>">
+</head>
+<body>
+
+  <!-- ── Desktop Window Frame (Native Windows App Replica) ────────────────── -->
+  <div class="desktop-window" id="desktop-window">
+
+    <!-- OS Window Title Bar -->
+    <div class="window-titlebar" id="window-titlebar">
+      <div class="window-title-left">
+        <span class="window-icon">☕</span>
+        <span class="window-title-text">Custom DNS | Server &amp; Client</span>
+      </div>
+      <div class="window-controls">
+        <button type="button" class="win-btn" id="btn-win-min" title="Minimize" onclick="minimizeWindow()">—</button>
+        <button type="button" class="win-btn" id="btn-win-max" title="Maximize / Restore" onclick="toggleMaximizeWindow()">□</button>
+        <button type="button" class="win-btn close" id="btn-win-close" title="Close" onclick="closeWindow()">✕</button>
+      </div>
+    </div>
+
+    <!-- App Banner Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <span class="brand-bracket">[ DNS ]</span>
+        <span class="brand-name">Custom DNS</span>
+        <span class="brand-sub">Client | Server | Cache</span>
+      </div>
+      <div class="header-badges">
+        <span class="gui-pill udp">UDP : 5454</span>
+        <span class="gui-pill port">Port : localhost</span>
+        <span id="pill-mongo" class="gui-pill mongo">MongoDB : Connected</span>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-bar" role="tablist">
+      <button class="tab-btn active" id="tab-btn-server" onclick="switchTab('server')">Server</button>
+      <button class="tab-btn" id="tab-btn-client" onclick="switchTab('client')">Client</button>
+      <button class="tab-btn" id="tab-btn-querylog" onclick="switchTab('querylog')">Query Log</button>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         TAB 1: SERVER
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="tab-content-server" class="tab-content active">
+
+      <!-- Server Top Controls & 5 Stats -->
+      <div class="server-top-row">
+
+        <!-- Controls Box -->
+        <div class="control-box">
+          <button id="btn-toggle-server" class="btn-start-server" onclick="toggleServer()">START SERVER</button>
+          <span id="badge-server-status" class="badge-status offline">OFFLINE</span>
+          <button class="btn-gui-ghost" onclick="clearServerLog()">Clear Log</button>
+          <button class="btn-gui-ghost" onclick="flushCache()">Flush Cache</button>
+        </div>
+
+        <!-- 5 Stats Cards with Matching Coloured Borders -->
+        <div class="stats-grid-5">
+          <div class="stat-card-box blue">
+            <div class="stat-card-stripe blue"></div>
+            <div id="stat-total-queries" class="stat-card-val blue">0</div>
+            <div class="stat-card-title">Total Queries</div>
+          </div>
+          <div class="stat-card-box green">
+            <div class="stat-card-stripe green"></div>
+            <div id="stat-cache-hits" class="stat-card-val green">0</div>
+            <div class="stat-card-title">Cache Hits</div>
+          </div>
+          <div class="stat-card-box amber">
+            <div class="stat-card-stripe amber"></div>
+            <div id="stat-cache-misses" class="stat-card-val amber">0</div>
+            <div class="stat-card-title">Cache Misses</div>
+          </div>
+          <div class="stat-card-box cyan">
+            <div class="stat-card-stripe cyan"></div>
+            <div id="stat-hit-rate" class="stat-card-val cyan">0%</div>
+            <div class="stat-card-title">Hit Rate</div>
+          </div>
+          <div class="stat-card-box purple">
+            <div class="stat-card-stripe purple"></div>
+            <div id="stat-cached-entries" class="stat-card-val purple">0</div>
+            <div class="stat-card-title">Cached Entries</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Split Layout: Server Log & Cache Viewer -->
+      <div class="server-split-grid">
+
+        <!-- Left: Server Log Card (Blue Border) -->
+        <div class="gui-bordered-card blue-border">
+          <div class="gui-card-header blue-text">
+            <span>SERVER LOG</span>
+            <button class="btn-gui-ghost btn-header-tiny" onclick="clearServerLog()">Clear</button>
+          </div>
+          <div id="server-log-console" class="terminal-log-box"></div>
+        </div>
+
+        <!-- Right: Cache Viewer Card (Purple Border) -->
+        <div class="gui-bordered-card purple-border">
+          <div class="gui-card-header purple-text">
+            <span>CACHE VIEWER (TTL COUNTDOWN)</span>
+            <button class="btn-gui-ghost btn-header-tiny" onclick="flushCache()">Flush</button>
+          </div>
+          <div class="table-container">
+            <table class="gui-table" id="cache-table">
+              <thead>
+                <tr>
+                  <th style="width: 38%;">Domain</th>
+                  <th style="width: 32%;">IP Address</th>
+                  <th style="width: 15%; text-align:center;">TTL Left</th>
+                  <th style="width: 15%; text-align:center;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="cache-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         TAB 2: CLIENT
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="tab-content-client" class="tab-content">
+
+      <!-- DNS Lookup Card (Cyan Border) -->
+      <div class="client-query-card cyan-border">
+        <div class="gui-card-header cyan-text">
+          <span>DNS LOOKUP</span>
+        </div>
+        <div class="client-query-body">
+          <form id="client-search-form" onsubmit="event.preventDefault(); doResolve();" class="lookup-input-row">
+            <input 
+              type="text" 
+              id="client-domain-input" 
+              class="lookup-input" 
+              placeholder="Enter domain name (e.g. google.com)..." 
+              autocomplete="off"
+              spellcheck="false"
+              required>
+            <button type="submit" id="btn-client-resolve" class="btn-resolve">RESOLVE</button>
+          </form>
+
+          <div class="quick-domain-chips">
+            <span class="chip-label">Quick Test:</span>
+            <button type="button" class="domain-chip" onclick="setAndResolve('google.com')">google.com</button>
+            <button type="button" class="domain-chip" onclick="setAndResolve('vtop.vit.ac.in')">vtop.vit.ac.in</button>
+            <button type="button" class="domain-chip" onclick="setAndResolve('github.com')">github.com</button>
+            <button type="button" class="domain-chip" onclick="setAndResolve('irctc.co.in')">irctc.co.in</button>
+            <button type="button" class="domain-chip" onclick="setAndResolve('youtube.com')">youtube.com</button>
+            <button type="button" class="domain-chip" onclick="setAndResolve('kproxy.com')">kproxy.com</button>
+            <button type="button" class="domain-chip" onclick="setAndResolve('localhost')">localhost</button>
+            <button type="button" class="domain-chip" onclick="setAndResolve('openai.com')">openai.com</button>
+          </div>
+
+          <div class="lookup-result-row">
+            <span class="result-lbl-ip">IP :</span>
+            <span id="client-res-ip" class="result-ip-val">--</span>
+            <span id="client-res-status" class="badge-res-status idle">IDLE</span>
+            <span id="client-res-time" class="result-time-val"></span>
+            <span id="client-res-source" class="result-source-val"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Split Layout: History & Client Log -->
+      <div class="server-split-grid">
+
+        <!-- Query History Card (Green Border) -->
+        <div class="gui-bordered-card green-border">
+          <div class="gui-card-header green-text">
+            <span>QUERY HISTORY</span>
+            <div class="header-action-buttons">
+              <button type="button" id="btn-import-chrome" class="btn-gui-ghost btn-header-action" onclick="importChromeHistory()">Import Chrome</button>
+              <button type="button" id="btn-reload-mongo" class="btn-gui-ghost btn-header-action" onclick="reloadMongoHistory()">Reload Mongo</button>
+              <button type="button" class="btn-gui-ghost btn-header-action" onclick="clearHistoryTable()">Clear</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="gui-table" id="history-table">
+              <thead>
+                <tr>
+                  <th style="width: 14%;">Time</th>
+                  <th style="width: 25%;">Domain</th>
+                  <th style="width: 21%;">IP</th>
+                  <th style="width: 16%;">Source</th>
+                  <th style="width: 12%;">Latency</th>
+                  <th style="width: 12%; text-align: center;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Client Socket Log Card (Amber Border) -->
+        <div class="gui-bordered-card amber-border">
+          <div class="gui-card-header amber-text">
+            <span>CLIENT LOG</span>
+            <button type="button" class="btn-gui-ghost btn-header-tiny" onclick="clearClientLog()">Clear</button>
+          </div>
+          <div id="client-log-console" class="terminal-log-box"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         TAB 3: QUERY LOG
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="tab-content-querylog" class="tab-content">
+      <div class="gui-bordered-card amber-border">
+        <div class="gui-card-header amber-text">
+          <span>DNS QUERY HISTORY (every lookup logged with date &amp; time)</span>
+          <div class="header-action-buttons">
+            <button type="button" class="btn-gui-ghost btn-header-action" onclick="refreshQueryLog()">Refresh History</button>
+            <button type="button" class="btn-gui-ghost btn-header-action" onclick="clearAllLogs()">Clear All Logs</button>
+          </div>
+        </div>
+        <div class="table-container" style="max-height: 520px;">
+          <table class="gui-table" id="query-log-table">
+            <thead>
+              <tr>
+                <th style="width: 12%;">Date</th>
+                <th style="width: 12%;">Time</th>
+                <th style="width: 32%;">Domain</th>
+                <th style="width: 24%;">IP Address</th>
+                <th style="width: 20%;">Source</th>
+              </tr>
+            </thead>
+            <tbody id="query-log-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Status -->
+    <footer class="window-footer">
+      <span class="footer-protocol">Protocol:  DNS|REQUEST|&lt;domain&gt;  -&gt;  DNS|RESPONSE|&lt;domain&gt;|&lt;ip&gt;   |   Error: DNS|ERROR|&lt;domain&gt;|DOMAIN_NOT_FOUND</span>
+      <span class="footer-path">CustomDNS</span>
+    </footer>
+
+  </div>
+
+  <!-- Toast Notification Popup -->
+  <div id="toast-notification" class="toast-popup"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
